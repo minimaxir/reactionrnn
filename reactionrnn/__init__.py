@@ -1,1 +1,1 @@
-from .textgenrnn import textgenrnn
+from .reactionrnn import reactionrnn

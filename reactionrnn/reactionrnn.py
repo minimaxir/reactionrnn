@@ -35,9 +35,11 @@ class reactionrnn:
         self.model_enc = Model(inputs=self.model.input,
                                outputs=self.model.get_layer('rnn').output)
 
-    def predict(self, text, **kwargs):
+    def predict(self, text, normalize=True, **kwargs):
         text_enc = reactionrnn_encode_sequence(text, self.vocab)
         predicts = self.model.predict(text_enc)[-1]
+        if normalize:
+            predicts = predicts / predicts.sum(axis=0)
         predicts_dict = {react: round(float(predicts[i]), 2)
                          for i, react in enumerate(self.REACTIONS)}
         predicts_dict = OrderedDict(sorted(predicts_dict.items(),

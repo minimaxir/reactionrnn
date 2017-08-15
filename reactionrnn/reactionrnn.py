@@ -35,25 +35,27 @@ class reactionrnn:
         self.model_enc = Model(inputs=self.model.input,
                                outputs=self.model.get_layer('rnn').output)
 
-    def predict(self, text, normalize=True, **kwargs):
-        text_enc = reactionrnn_encode_sequence(text, self.vocab)
-        predicts = self.model.predict(text_enc)[-1]
+    def predict(self, texts, normalize=True, **kwargs):
+        texts_enc = reactionrnn_encode_sequences(texts, self.tokenizer)
+        predicts = self.model.predict(texts_enc)
         if normalize:
-            predicts = predicts / predicts.sum(axis=0)
-        predicts_dict = {react: round(float(predicts[i]), 2)
-                         for i, react in enumerate(self.REACTIONS)}
-        predicts_dict = OrderedDict(sorted(predicts_dict.items(),
-                                           key=lambda t: -t[1]))
-        return predicts_dict
+            predicts = predicts / predicts.sum(axis=1)[:, np.newaxis]
+        if len(texts_enc) == 1:
+            predicts_dict = {react: round(float(predicts[0][i]), 4)
+                             for i, react in enumerate(self.REACTIONS)}
+            predicts_dict = OrderedDict(sorted(predicts_dict.items(),
+                                               key=lambda t: -t[1]))
+            return predicts_dict
+        return predicts
 
-    def predict_label(self, text, **kwargs):
-        text_enc = reactionrnn_encode_sequence(text, self.vocab)
-        predicts = np.around(self.model.predict(text_enc)[-1], decimals=2)
+    def predict_label(self, texts, **kwargs):
+        texts_enc = reactionrnn_encode_sequences(texts, self.tokenizer)
+        predicts = self.model.predict(texts_enc)[0]
         return self.REACTIONS[np.argmax(predicts)]
 
-    def encode(self, text, **kwargs):
-        text_enc = reactionrnn_encode_sequence(text, self.vocab)
-        predicts = self.model_enc.predict(text_enc)[-1]
+    def encode(self, texts, **kwargs):
+        text_enc = reactionrnn_encode_sequences(texts, self.tokenizer)
+        predicts = self.model_enc.predict(text_enc)
         return predicts
 
 
@@ -76,11 +78,13 @@ def reactionrnn_model(weights_path, num_classes, maxlen=140):
     return model
 
 
-def reactionrnn_encode_sequence(text, vocab, maxlen=140):
+def reactionrnn_encode_sequences(texts, tokenizer, maxlen=140):
     '''
-    Encodes a text into the corresponding encoding for prediction with
+    Encodes text(s) into the corresponding encoding(s) for prediction(s) with
     the model.
     '''
 
-    encoded = np.array([vocab.get(x, 0) for x in text])
-    return sequence.pad_sequences([encoded], maxlen=maxlen)
+    texts = texts if isinstance(texts, list) else [texts]
+    texts_enc = tokenizer.texts_to_sequences(texts)
+    texts_enc = sequence.pad_sequences(texts_enc, maxlen=maxlen)
+    return texts_enc

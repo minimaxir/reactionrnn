@@ -1,3 +1,10 @@
 /dataset
 /experiments
 /results
+__pycache__
+/build
+/dist
+/reactionrnn.egg-info
+/.ipynb_checkpoints
+/docs/.ipynb_checkpoints
+*.pyc

@@ -8,3 +8,6 @@ __pycache__
 /.ipynb_checkpoints
 /docs/.ipynb_checkpoints
 *.pyc
+.Rproj.user
+.Rhistory
+.RData

@@ -35,11 +35,9 @@ class reactionrnn:
         self.model_enc = Model(inputs=self.model.input,
                                outputs=self.model.get_layer('rnn').output)
 
-    def predict(self, texts, normalize=True, **kwargs):
+    def predict(self, texts, **kwargs):
         texts_enc = reactionrnn_encode_sequences(texts, self.tokenizer)
-        predicts = self.model.predict(texts_enc)
-        if normalize:
-            predicts = predicts / predicts.sum(axis=1)[:, np.newaxis]
+        predicts = self.model.predict(texts_enc, batch_size=1)
         if len(texts_enc) == 1:
             predicts_dict = {react: round(float(predicts[0][i]), 4)
                              for i, react in enumerate(self.REACTIONS)}
@@ -70,7 +68,8 @@ def reactionrnn_model(weights_path, num_classes, maxlen=140):
                          name='embedding')(input)
     rnn = GRU(256, return_sequences=False, name='rnn')(embedded)
     output = Dense(5, name='output',
-                   activation=lambda x: K.clip(x, 0., 1.))(rnn)
+                   activation=lambda x: K.relu(x) / K.sum(K.relu(x),
+                                                          axis=-1))(rnn)
 
     model = Model(inputs=[input], outputs=[output])
     model.load_weights(weights_path, by_name=True)

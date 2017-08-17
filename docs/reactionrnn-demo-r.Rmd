@@ -1,0 +1,133 @@
+---
+title: "reactionrnn Demo"
+author: "Max Woolf (@minimaxir)"
+date: "2017-08-18"
+output:
+  html_notebook:
+    highlight: tango
+    mathjax: null
+---
+
+*Max's open-source projects are supported by his [Patreon](https://www.patreon.com/minimaxir). If you found this project helpful, any monetary contributions to the Patreon are appreciated and will be put to good creative use.*
+
+## Intro
+
+reactionrnn is a Python module on top of Keras/TensorFlow which can easily predict the proportionate reactions (love, wow, haha, sad, angry) to a given text using a pretrained recurrent neural network:
+
+```{r}
+library(reactionrnn)
+
+react <- reactionrnn()
+```
+
+The `reactionrnn` initializer builds a normal Keras model using pretrained weights, and can be accessed using the `$model` property:
+
+```{r}
+react$model %>% summary()
+(react$model %>% get_layer('rnn') %>% get_weights())[[3]][1:10]
+```
+
+## Predict Reaction to Single Text
+
+The `predict` function returns an named vector of the five predicted reactions to the given text (if input is a single string or 1-element character list/vector), sorted from strongest to weakest.
+
+**NOTE: Emoji examples ommited because R Notebook chunk processing breaks if a raw emoji is present. Emojis will still behave as expected in R usage otherwise.**
+
+```{r}
+prediction <- react %>% predict("Happy Mother's Day from the Chicago Cubs!")
+prediction
+```
+
+```{r}
+react %>% predict("He was only 41.")
+react %>% predict("Everyone loves autoplaying videos!")
+```
+
+Like a normal named vector, you can access the value by key.
+
+```{r}
+prediction['wow']
+```
+
+If you just want the strongest predicted label for a given text(s), you can access that with `predict_label`. (good for classification)
+
+```{r}
+react %>% predict_label("Happy Mother's Day from the Chicago Cubs!")
+```
+
+```{r}
+react %>% predict_label(c("He was only 41.", "Everyone loves autoplaying videos!"))
+```
+
+
+
+## Predict Reaction to Multiple Texts
+
+If you provide a `list`/`vector` of texts to `predict()`, the return value is a `data.frame` of (`n`, 5), where `n` is the number of texts.
+
+```{r}
+texts <- c('Never gonna give you up, never gonna let you down',
+            'Never gonna run around and desert you',
+            'Never gonna make you cry, never gonna say goodbye',
+            'Never gonna tell a lie and hurt you')
+
+react %>% predict(texts)
+```
+
+## Encode Text as Vector
+
+You can also encode text as a 256D vector, which unlike those produced by word2vec/doc2vec/fasttext, incorporates the information provided by modern grammar including punctuation and emoji.
+
+```{r}
+encoding <- react %>% encode("DYING.")
+encoding[1, 1:5]
+encoding %>% dim()
+```
+
+You can also encode multiple texts as vectors.
+
+
+```{r}
+encoding <- react %>% encode(texts)
+encoding[, 1:5]
+encoding %>% dim()
+```
+
+I strongly recommend using PCA to both reduce the high dimensionality of the text and align the given encoded texts in context of each other.
+
+```{r}
+pca <- prcomp(encoding)
+(pca %>% predict(encoding))[,1:2]
+```
+
+```{r}
+explained_variance <- pca$sdev ^ 2/ sum(pca$sdev ^ 2)
+explained_variance
+sum(explained_variance[1:2])
+```
+
+These 2 components explain about 90% of the variation in the text; something which would hard to achieve without overfitting on only 4 text documents!
+
+# LICENSE
+
+MIT License
+
+Copyright (c) 2017 Max Woolf
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

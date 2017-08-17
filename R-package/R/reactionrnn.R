@@ -21,7 +21,7 @@ reactionrnn <- function() {
 
 
 predict.reactionrnn <- function(obj, texts) {
-  texts_enc <- texts %>% as.list() %>% encode_sequences(obj$tokenizer)
+  texts_enc <- texts %>% strsplit('') %>% encode_sequences(obj$tokenizer)
   predictions <- obj$model %>% predict(texts_enc, batch_size=1)
   if (nrow(predictions) == 1) {
     predictions <- predictions %>% c() %>% setNames(obj$reactions) %>% sort(T)
@@ -36,7 +36,7 @@ predict.reactionrnn <- function(obj, texts) {
 encode <- function(object, ...) UseMethod("encode")
 
 encode.reactionrnn <- function(obj, texts) {
-  texts_enc <- texts %>% as.list() %>% encode_sequences(obj$tokenizer)
+  texts_enc <- texts %>% strsplit('') %>% encode_sequences(obj$tokenizer)
   predictions <- obj$model_enc %>% predict(texts_enc) %>% as.data.frame()
   return(predictions)
 }
@@ -44,7 +44,7 @@ encode.reactionrnn <- function(obj, texts) {
 predict_label <- function(object, ...) UseMethod("predict_label")
 
 predict_label.reactionrnn <- function(obj, texts) {
-  texts_enc <- texts %>% as.list() %>% encode_sequences(obj$tokenizer)
+  texts_enc <- texts %>% strsplit('') %>% encode_sequences(obj$tokenizer)
   predictions <- obj$model %>% predict(texts_enc, batch_size=1) %>% apply(1, which.max)
   return(obj$reactions[predictions])
 }

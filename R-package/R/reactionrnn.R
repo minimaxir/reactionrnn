@@ -5,14 +5,14 @@ reactionrnn <- function() {
   tokenizer$word_index <- fromJSON(file="data/reactionrnn_vocab.json")
   num_classes = length(tokenizer$word_index) + 1
   model = reactionrnn_build("data/reactionrnn_weights.hdf5", num_classes)
-  #model_enc = keras_model(inputs = model %>% get_layer('input'),
-  #                        outputs = model %>% get_layer('rnn'))
+  model_enc = keras_model(inputs = model$input,
+                          outputs = get_layer(model, 'rnn')$output)
   structure(list(maxlen=maxlen,
                  reactions=reactions,
                  tokenizer=tokenizer,
                  num_classes=num_classes,
-                 model=model
-                 #model_enc
+                 model=model,
+                 model_enc=model_enc
                  ), class="reactionrnn")
 }
 
@@ -27,5 +27,13 @@ predict.reactionrnn <- function(obj, texts) {
     predictions <- predictions %>% as.data.frame() %>% setNames(obj$reactions)
   }
 
+  return(predictions)
+}
+
+encode <- function(object, ...) UseMethod("encode")
+
+encode.reactionrnn <- function(obj, texts) {
+  texts_enc <- texts %>% as.list() %>% encode_sequences(obj$tokenizer)
+  predictions <- obj$model_enc %>% predict(texts_enc) %>% as.data.frame()
   return(predictions)
 }

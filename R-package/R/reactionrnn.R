@@ -2,7 +2,7 @@ reactionrnn <- function() {
   maxlen <- 140
   reactions <- c('love', 'wow', 'haha', 'sad', 'angry')
   tokenizer <- text_tokenizer(filters='', char_level=T)
-  tokenizer$word_index <- fromJSON(file="data/reactionrnn_vocab.json")
+  tokenizer$word_index <- rjson::fromJSON(file="data/reactionrnn_vocab.json")
   num_classes = length(tokenizer$word_index) + 1
   model = reactionrnn_build("data/reactionrnn_weights.hdf5", num_classes)
   model_enc = keras_model(inputs = model$input,

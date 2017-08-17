@@ -37,3 +37,11 @@ encode.reactionrnn <- function(obj, texts) {
   predictions <- obj$model_enc %>% predict(texts_enc) %>% as.data.frame()
   return(predictions)
 }
+
+predict_label <- function(object, ...) UseMethod("predict_label")
+
+predict_label.reactionrnn <- function(obj, texts) {
+  texts_enc <- texts %>% as.list() %>% encode_sequences(obj$tokenizer)
+  predictions <- obj$model %>% predict(texts_enc, batch_size=1) %>% apply(1, which.max)
+  return(obj$reactions[predictions])
+}

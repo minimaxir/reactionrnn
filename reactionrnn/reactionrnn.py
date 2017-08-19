@@ -48,8 +48,8 @@ class reactionrnn:
 
     def predict_label(self, texts, **kwargs):
         texts_enc = reactionrnn_encode_sequences(texts, self.tokenizer)
-        predicts = self.model.predict(texts_enc)[0]
-        return self.REACTIONS[np.argmax(predicts)]
+        predicts = self.model.predict(texts_enc, batch_size=1)
+        return list(np.array(self.REACTIONS)[np.argmax(predicts, axis=1)])
 
     def encode(self, texts, **kwargs):
         text_enc = reactionrnn_encode_sequences(texts, self.tokenizer)

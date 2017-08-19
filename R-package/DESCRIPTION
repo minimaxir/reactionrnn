@@ -2,11 +2,12 @@ Package: reactionrnn
 Type: Package
 Title: Pretrained Character-Based Neural Network For Predicting the Reaction to Given Text(s).
 Version: 0.1.0
-Date: 2017-08-17
+Date: 2017-08-19
 Author: Max Woolf
 Maintainer: Max Woolf <max@minimaxir.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: An R package on top of Keras and TensorFlow
+    which can easily predict the proportionate reactions (love, wow, haha, sad, angry) to a given text
+    using a pretrained recurrent neural network.
 License: MIT
 Encoding: UTF-8
 LazyData: true

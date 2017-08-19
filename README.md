@@ -1,6 +1,6 @@
 # reactionrnn
 
-reaction is a Python 2/3 module + R package on top of [Keras](https://github.com/fchollet/keras)/[TensorFlow](https://www.tensorflow.org) which can easily predict the proportionate reactions (love, wow, haha, sad, angry) to a given text using a pretrained recurrent neural network:
+reactionrnn is a Python 2/3 module + R package on top of [Keras](https://github.com/fchollet/keras)/[TensorFlow](https://www.tensorflow.org) which can easily predict the proportionate reactions (love, wow, haha, sad, angry) to a given text using a pretrained recurrent neural network:
 
 ```python
 from reactionrnn import reactionrnn
@@ -12,7 +12,7 @@ react.predict("Happy Mother's Day from the Chicago Cubs!")
 [('love', 0.9765), ('wow', 0.0235), ('haha', 0.0), ('sad', 0.0), ('angry', 0.0)]
 ```
 
-The pretrained model was trained on hundreds of thousands of Facebook posts. Unlike traditional text models using tools like word2vec/doc2vec/NLTK, reactionrnn handles text at the character level, allowing it to incorporate capitalization, grammar, sarcasm, and emoji.
+The pretrained model was trained on hundreds of thousands of Facebook posts. Unlike traditional text models using tools like word2vec/doc2vec/NLTK, reactionrnn handles text at the character level, allowing it to incorporate capitalization, grammar, text length, sarcasm, and emoji.
 
 ```
 > react.predict("This is scary AF!😱😱")
@@ -34,14 +34,14 @@ The pretrained model was trained on hundreds of thousands of Facebook posts. Unl
 [('angry', 0.8667), ('wow', 0.1333), ('love', 0.0), ('haha', 0.0), ('sad', 0.0)]
 ```
 
-As a bonus, the model can encode text as a 256D vector (incorporating context of grammar/caps/punc/emoji) which can then be fed into other machine learning/deep learning models.
+As a bonus, the model can encode text as a 256D vector (incorporating grammar/caps/length/punc/emoji) which can then be fed into other machine learning/deep learning models.
 
 ```
 > react.encode("DYING. 😄")
 [ 0.0411452   0.87985831  0.31406021, ...]
 ```
 
-Did I mention that reactionnn is also available as an R package?
+Did I mention that reactionnn is also available as an R package with feature parity?
 
 ```
 library(reactionrnn)
@@ -62,10 +62,11 @@ For Python, reactionrnn can be installed [from pypi](https://pypi.python.org/pyp
 sudo pip3 install reactionrnn
 ```
 
-For R, you can install reactionrnn from CRAN:
+For R, you can install reactionrnn from this GitHub repo (working on resolving issues to get package on CRAN):
 
 ```
-install.packages('reactionrnn')
+# install.packages('devtools')
+devtools::install_github("minimaxir/reactionrnn", subdir="R-package")
 ```
 
 You can view a demo of common features in [this Jupyter Notebook](/docs/textgenrnn-demo.ipynb). (full documentation coming soon)

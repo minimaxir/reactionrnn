@@ -12,7 +12,7 @@ react.predict("Happy Mother's Day from the Chicago Cubs!")
 [('love', 0.9765), ('wow', 0.0235), ('haha', 0.0), ('sad', 0.0), ('angry', 0.0)]
 ```
 
-The pretrained model was trained on hundreds of thousands of Facebook posts. Unlike traditional text models using tools like word2vec/doc2vec/NLTK, reactionrnn handles text at the character level, allowing it to incorporate capitalization, grammar, text length, sarcasm, and emoji.
+The 1.3 MB model was trained on hundreds of thousands of Facebook posts. Unlike traditional text models using tools like [word2vec](https://en.wikipedia.org/wiki/Word2vec)/[doc2vec](https://radimrehurek.com/gensim/models/doc2vec.html), reactionrnn handles text at the character level, allowing it to incorporate capitalization, grammar, text length, sarcasm, and emoji.
 
 ```
 > react.predict("This is scary AF!😱😱")
@@ -62,41 +62,35 @@ For Python, reactionrnn can be installed [from pypi](https://pypi.python.org/pyp
 sudo pip3 install reactionrnn
 ```
 
-For R, you can install reactionrnn from this GitHub repo (working on resolving issues to get package on CRAN):
+For R, you can install reactionrnn from this GitHub repo with devtools (working on resolving issues to get package on CRAN):
 
 ```
 # install.packages('devtools')
 devtools::install_github("minimaxir/reactionrnn", subdir="R-package")
 ```
 
-You can view a demo of common features in [this Jupyter Notebook](/docs/textgenrnn-demo.ipynb). (full documentation coming soon)
-
-`/datasets` contains example datasets using Hacker News/Reddit data for training textgenrnn.
-
-`/weights` contains further-pretrained models on the aforementioned datasets which can be loaded into textgenrnn.
-
-`/outputs` contains examples of text generated from the above pretrained models.
+You can view a demo of common features in [this Jupyter Notebook](/docs/reactionrnn-demo-python.ipynb) for Python, and [this R Notebook](http://minimaxir.com/notebooks/reactionrnn/) for R. (full documentation coming soon)
 
 ## Neural Network Architecture and Implementation
 
 ![](/docs/model_shapes.png)
 
-reactionrnn is based off of the June 2016 blog post I wrote titled [Classifying the Emotions of Facebook Posts Using Reactions Data](http://minimaxir.com/2016/06/interactive-reactions/) which noted that there is nuance to the proportionality of the reactions on a Facebook status. What makes a Facebook post "WOW" but *not* "HAHA"? Is there a semantic difference between a post with 100% WOW and 50% WOW> A year later, Facebook now has enough public data to sufficiently train a neural network to understand these nuances.
+reactionrnn is based off of the June 2016 blog post I wrote titled [Classifying the Emotions of Facebook Posts Using Reactions Data](http://minimaxir.com/2016/06/interactive-reactions/), which noted that there is a certain nuance to the proportionality of the reactions on a Facebook status. What makes a Facebook post "WOW" but *not* "HAHA"? Is there a semantic difference between a post with 100% WOW and 50% WOW? A year later, Facebook now has enough public data to sufficiently train a neural network to understand these nuances.
 
-reactionrnn takes in an input of up to 140 characters, converts each character to a 100D character embedding vector, and feeds those into a 256-cell gated recurrent unit layer. That output is mappedregressed ntage proportion* (**notch of the five non-Like Reactions; all  simultaneously and outputs predicted values for eachpredicted values will sum to 1.
+reactionrnn takes in an input of up to 140 characters (for compatability with Twitter tweets), converts each character to a 100D character embedding vector, and feeds those into a 256-cell [gated recurrent unit](https://en.wikipedia.org/wiki/Gated_recurrent_unit) layer. That output regresses the five non-Like Reactions all simultaneously and outputs predicted values for each; predicted values will sum to 1 (unlike Google's [Perspective API](https://www.perspectiveapi.com), the output is **not** the probability of the label as is the case a classification model!)
 
-The  (the output is **not** the probability of the label like a classification problem!)model weights included with the package are trained on the captions on hundreds of thousands of public Facebook statuses on Facebook Pages ([via my Facebook Page Post Scraper](https://github.com/minimaxir/facebook-page-post-scraper)), from a very *diverse* variety of subreddits/Pages (necessary since some Pages will have *very* different reactions to a given text!). The network was also trained in such a way that the `rnn` layer is decontextualized in order to both improve training performance and mitigate authorial and temporal bias.
+The model weights included with the package are trained on the captions on hundreds of thousands of public Facebook statuses on Facebook Pages ([via my Facebook Page Post Scraper](https://github.com/minimaxir/facebook-page-post-scraper)), from a very *diverse* variety of subreddits/Pages (which is necessary since some Pages will have *very* different reactions to a given text!). The network was also trained in such a way that the `rnn` layer is decontextualized in order to both improve training performance and mitigate authorial and temporal biases toward given reactions.
 
-The `encode` function returns the value produced by the GRU.
+The `encode` function of reactionrnn returns the intermediate output from the GRU.
 
 
 ## Notes
 
-* Keep in mind that the network is trained on modern (2016-2017) language. As a result, using rhetorical/ironic statements will often yield love/wow responses instead of sad/angry. 
+* Keep in mind that the network is trained on modern (2016-2017) language. As a result, inputting rhetorical/ironic statements will often yield love/wow responses and not sad/angry. 
 
 * If a text sequence is >140 characters, reactionrnn will only use the first 140 characters.
 
-* If you do use `encode` on multiple texts, I strongly recommend using [principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis) to both reduce the high dimensionality of the text (i.e to 30-50D) and align the given encoded texts in context of each other. (see reactionrnn demos on how to implement PCA)
+* If you do use `encode` on multiple texts, I strongly recommend using [principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis) to both reduce the high dimensionality of the text (i.e to 30-50D) and align the given encoded texts. (see reactionrnn demos on how to implement PCA)
 
 * A GPU is not required to use reactionrnn.
 
@@ -114,4 +108,8 @@ Max Woolf ([@minimaxir](http://minimaxir.com))
 
 ## Disclaimer
 
-reactionrnn is not supported by Facnot endorsed ebook.
+reactionrnn is not supported by nor endorsed by Facebook.
+
+## License
+
+MIT

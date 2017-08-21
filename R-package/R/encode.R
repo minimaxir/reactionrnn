@@ -1,3 +1,4 @@
+#' @export
 encode_sequences <- function(texts, tokenizer, maxlen=140) {
   if (!is.vector(texts)) {texts <- c(texts)}
   texts_enc <- tokenizer %>% texts_to_sequences(texts)

@@ -1,3 +1,4 @@
+#' @export
 reactionrnn <- function() {
   weights_path <- system.file("extdata", "reactionrnn_weights.hdf5", package="reactionrnn")
   vocab_path <- system.file("extdata", "reactionrnn_vocab.json", package="reactionrnn")
@@ -19,7 +20,7 @@ reactionrnn <- function() {
                  ), class="reactionrnn")
 }
 
-
+#' @export
 predict.reactionrnn <- function(obj, texts) {
   texts_enc <- texts %>% strsplit('') %>% encode_sequences(obj$tokenizer)
   predictions <- obj$model %>% predict(texts_enc, batch_size=1)
@@ -41,8 +42,10 @@ encode.reactionrnn <- function(obj, texts) {
   return(predictions)
 }
 
+#' @export
 predict_label <- function(object, ...) UseMethod("predict_label")
 
+#' @export
 predict_label.reactionrnn <- function(obj, texts) {
   texts_enc <- texts %>% strsplit('') %>% encode_sequences(obj$tokenizer)
   predictions <- obj$model %>% predict(texts_enc, batch_size=1) %>% apply(1, which.max)

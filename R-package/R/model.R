@@ -1,3 +1,4 @@
+#' @export
 reactionrnn_build <- function(weights_path, num_classes, maxlen=140) {
   K <- backend()
 

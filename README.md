@@ -62,7 +62,8 @@ For Python, reactionrnn can be installed [from pypi](https://pypi.python.org/pyp
 python3 -m pip install reactionrnn
 ```
 
-You may need to create a venv (`python3 -m venv <path>`) first
+You may need to create a venv (`python3 -m venv <path>`) first.
+
 For R, you can install reactionrnn from this GitHub repo with devtools (working on resolving issues to get package on CRAN):
 
 ```
